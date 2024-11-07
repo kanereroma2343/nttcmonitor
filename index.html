@@ -334,6 +334,63 @@
         display: table;
     }
 }
+
+/* New Table Styles */
+.table-responsive {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    margin: 2.5rem auto;
+    border-radius: 16px;
+    max-width: 1400px;
+    background: #ffffff;
+    border: none;
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    color: #2d3748;
+}
+
+.thead-dark {
+    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+}
+
+.thead-dark th {
+    color: white;
+    border: none;
+    padding: 20px 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-align: left;
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.table tbody tr:hover {
+    background-color: #f8fafc;
+    transform: scale(1.002);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.table td {
+    padding: 18px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    font-weight: 400;
+    vertical-align: middle;
+    transition: all 0.3s ease;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f8f9fa;
+}
 </style>
 </body>
 </html>
