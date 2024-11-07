@@ -31,6 +31,7 @@
         placeholder="Search throughout all pages..."
         autocomplete="off"
     >
+    <button id="searchButton" class="search-button">Search</button>
     <div id="searchStatus" class="search-status"></div>
 </div>
 
@@ -79,6 +80,7 @@
     let originalData = [];
     let searchTimeout;
     let isSearching = false;
+    let lastSearchTerm = '';
 
     // Fetch data from data.json and render it
     async function loadData() {
@@ -145,8 +147,12 @@
     }
 
     // Updated search event listener
-    document.getElementById('searchInput').addEventListener('input', function(e) {
-        debounceSearch(this.value);
+    document.getElementById('searchButton').addEventListener('click', function() {
+        const searchTerm = document.getElementById('searchInput').value;
+        if (searchTerm !== lastSearchTerm) {
+            lastSearchTerm = searchTerm;
+            debounceSearch(searchTerm);
+        }
     });
 
     // Function to render table based on current page and search
@@ -232,6 +238,13 @@
 
 .search-container {
     position: relative;
+}
+
+.search-button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    cursor: pointer;
 }
 </style>
 </body>
