@@ -42,7 +42,7 @@
         $offset = ($current_page - 1) * $entries_per_page;
         
         // Read JSON data
-        $jsonData = file_get_contents('data.json');
+        $jsonData = file_get_contents('https://raw.githubusercontent.com/kanereroma2343/nttcmonitor/refs/heads/main/data.json');
         $data = json_decode($jsonData, true);
         
         // Filter out empty rows and get total valid entries
