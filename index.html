@@ -48,28 +48,14 @@
                 <th>Validity</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Static example rows; replace with dynamic PHP rows when on server -->
-            <tr>
-                <td>Sample Last Name</td>
-                <td>Sample First Name</td>
-                <td>Sample Middle Name</td>
-                <td>Jr</td>
-                <td>Qualification Example</td>
-                <td>12345</td>
-                <td>67890</td>
-                <td>2024-01-01</td>
-                <td>2025-01-01</td>
-            </tr>
-            <!-- Additional rows would go here -->
+        <tbody id="data-table-body">
+            <!-- Data will be dynamically loaded here -->
         </tbody>
     </table>
 
     <div class="pagination">
-        <!-- Pagination buttons; add dynamic PHP when on server -->
-        <a href="?page=1" class="page-link active">1</a>
-        <a href="?page=2" class="page-link">2</a>
-        <!-- Additional pagination buttons as needed -->
+        <!-- Pagination buttons (JavaScript-based) -->
+        <span id="pagination"></span>
     </div>
 </div>
 
@@ -85,28 +71,76 @@
 </footer>
 
 <script>
-    document.getElementById('searchInput').addEventListener('keyup', function(e) {
-        clearTimeout(this.searchTimeout);
-        this.searchTimeout = setTimeout(() => {
-            let searchValue = this.value.trim();
-            let url = new URL(window.location.href);
-            if (searchValue) {
-                url.searchParams.set('search', searchValue);
-                url.searchParams.set('page', '1');
-            } else {
-                url.searchParams.delete('search');
-            }
-            window.location.href = url.toString();
-        }, 500);
+    // Global variables for pagination
+    const entriesPerPage = 10;
+    let currentPage = 1;
+    let filteredData = [];
+
+    // Fetch data from data.json and render it
+    async function loadData() {
+        try {
+            const response = await fetch('data.json');
+            const data = await response.json();
+            filteredData = data.slice(4).filter(row => row.D || row.E); // Remove empty rows
+            renderTable();
+        } catch (error) {
+            console.error("Error loading data:", error);
+        }
+    }
+
+    // Function to render table based on current page and search
+    function renderTable() {
+        const startIndex = (currentPage - 1) * entriesPerPage;
+        const paginatedData = filteredData.slice(startIndex, startIndex + entriesPerPage);
+        
+        const tableBody = document.getElementById("data-table-body");
+        tableBody.innerHTML = paginatedData.map(row => `
+            <tr>
+                <td data-label="Last Name">${row.D || ''}</td>
+                <td data-label="First Name">${row.E || ''}</td>
+                <td data-label="Middle Name">${row.F || ''}</td>
+                <td data-label="Extension">${row.G || ''}</td>
+                <td data-label="Qualification">${row.S || ''}</td>
+                <td data-label="Certificate Number">${row.AD || ''}</td>
+                <td data-label="Control Number">${row.AG || ''}</td>
+                <td data-label="Date of Issuance">${row.AE || ''}</td>
+                <td data-label="Validity">${row.V || ''}</td>
+            </tr>
+        `).join("");
+
+        renderPagination();
+    }
+
+    // Function to render pagination
+    function renderPagination() {
+        const totalPages = Math.ceil(filteredData.length / entriesPerPage);
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = Array.from({length: totalPages}, (_, i) => i + 1)
+            .map(page => `<a href="#" class="page-link ${page === currentPage ? 'active' : ''}" onclick="setPage(${page})">${page}</a>`)
+            .join(" ");
+    }
+
+    // Function to handle pagination click
+    function setPage(page) {
+        currentPage = page;
+        renderTable();
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        filteredData = filteredData.filter(row => 
+            (row.D || '').toLowerCase().includes(searchTerm) ||
+            (row.E || '').toLowerCase().includes(searchTerm) ||
+            (row.S || '').toLowerCase().includes(searchTerm) ||
+            (row.AD || '').toLowerCase().includes(searchTerm)
+        );
+        currentPage = 1;
+        renderTable();
     });
 
-    window.addEventListener('load', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const searchTerm = urlParams.get('search');
-        if (searchTerm) {
-            document.getElementById('searchInput').value = searchTerm;
-        }
-    });
+    // Initialize data on page load
+    loadData();
 </script>
 </body>
 </html>
