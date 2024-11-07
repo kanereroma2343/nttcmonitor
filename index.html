@@ -72,7 +72,7 @@
 
 <script>
     // Global variables for pagination
-    const entriesPerPage = 10;
+    const entriesPerPage = 200;
     let currentPage = 1;
     let filteredData = [];
 
@@ -129,14 +129,18 @@
     // Search functionality
     document.getElementById('searchInput').addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
-        filteredData = filteredData.filter(row => 
-            (row.D || '').toLowerCase().includes(searchTerm) ||
-            (row.E || '').toLowerCase().includes(searchTerm) ||
-            (row.S || '').toLowerCase().includes(searchTerm) ||
-            (row.AD || '').toLowerCase().includes(searchTerm)
-        );
-        currentPage = 1;
-        renderTable();
+        loadData().then(() => {
+            if (searchTerm) {
+                filteredData = filteredData.filter(row => 
+                    (row.D || '').toLowerCase().includes(searchTerm) ||
+                    (row.E || '').toLowerCase().includes(searchTerm) ||
+                    (row.S || '').toLowerCase().includes(searchTerm) ||
+                    (row.AD || '').toLowerCase().includes(searchTerm)
+                );
+            }
+            currentPage = 1;
+            renderTable();
+        });
     });
 
     // Initialize data on page load
