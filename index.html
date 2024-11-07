@@ -311,6 +311,29 @@
         margin-left: 10px;
     }
 }
+
+/* Ensure table layout is consistent across all screen sizes */
+.container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.container th, .container td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.container th {
+    background-color: #f2f2f2;
+}
+
+/* Remove mobile-specific styles that change table layout */
+@media (max-width: 767px) {
+    .container table, .container th, .container td {
+        display: table;
+    }
+}
 </style>
 </body>
 </html>
