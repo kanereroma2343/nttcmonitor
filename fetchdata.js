@@ -3,18 +3,28 @@ const rowsPerPage = 10;
 let allData = [];
 let filteredData = [];
 
-// Fetch data from GitHub repository
+// Fetch data from output.json
 async function fetchData() {
-    const loadingMessage = '<tr><td colspan="9">Loading data...</td></tr>';
     const tableBody = document.getElementById('tableBody');
-    tableBody.innerHTML = loadingMessage;
+    tableBody.innerHTML = '<tr><td colspan="9">Loading data...</td></tr>';
     
     try {
-        const response = await fetch('data.json');
+        const response = await fetch('data.json', {
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         allData = await response.json();
+        
+        // Validate data is an array
+        if (!Array.isArray(allData)) {
+            throw new Error('Invalid data format');
+        }
+        
         filteredData = [...allData];
         
         // Initialize the UI components
@@ -23,23 +33,19 @@ async function fetchData() {
         setupPagination();
     } catch (error) {
         console.error('Error:', error);
-        tableBody.innerHTML = '<tr><td colspan="9">Error loading data. Please try refreshing the page.</td></tr>';
+        tableBody.innerHTML = `<tr><td colspan="9">Error loading data: ${error.message}</td></tr>`;
     }
 }
 
 // Populate province dropdown with unique values
 function populateProvinceDropdown() {
-    const provinceSelect = document.getElementById('provinceSelect');
-    provinceSelect.innerHTML = '<option value="">All Provinces</option>'; // Add default option
-    
     const provinces = [...new Set(allData.map(item => item.province))].sort();
+    const provinceSelect = document.getElementById('provinceSelect');
     provinces.forEach(province => {
-        if (province) { // Only add non-empty provinces
-            const option = document.createElement('option');
-            option.value = province;
-            option.textContent = province;
-            provinceSelect.appendChild(option);
-        }
+        const option = document.createElement('option');
+        option.value = province;
+        option.textContent = province;
+        provinceSelect.appendChild(option);
     });
 }
 
@@ -56,21 +62,25 @@ function displayData() {
         return;
     }
     
+    const fragment = document.createDocumentFragment();
+    
     filteredData.slice(startIndex, endIndex).forEach(item => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${item.lastName || ''}</td>
-            <td>${item.firstName || ''}</td>
-            <td>${item.middleName || ''}</td>
-            <td>${item.extension || ''}</td>
-            <td>${item.qualification || ''}</td>
-            <td>${item.certificateNumber || ''}</td>
-            <td>${item.controlNumber || ''}</td>
-            <td>${item.dateOfIssuance || ''}</td>
-            <td>${item.validity || ''}</td>
+            <td>${escapeHtml(item.lastName || '')}</td>
+            <td>${escapeHtml(item.firstName || '')}</td>
+            <td>${escapeHtml(item.middleName || '')}</td>
+            <td>${escapeHtml(item.extension || '')}</td>
+            <td>${escapeHtml(item.qualification || '')}</td>
+            <td>${escapeHtml(item.certificateNumber || '')}</td>
+            <td>${escapeHtml(item.controlNumber || '')}</td>
+            <td>${escapeHtml(item.dateOfIssuance || '')}</td>
+            <td>${escapeHtml(item.validity || '')}</td>
         `;
-        tableBody.appendChild(row);
+        fragment.appendChild(row);
     });
+    
+    tableBody.appendChild(fragment);
 }
 
 // Setup pagination
@@ -78,9 +88,6 @@ function setupPagination() {
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
     const paginationElement = document.getElementById('pagination');
     paginationElement.innerHTML = '';
-
-    // Only show pagination if there are results
-    if (filteredData.length === 0) return;
 
     for (let i = 1; i <= totalPages; i++) {
         const button = document.createElement('button');
@@ -101,11 +108,11 @@ function setupPagination() {
 // Search functionality
 document.getElementById('searchForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const selectedProvince = document.getElementById('provinceSelect').value;
 
     filteredData = allData.filter(item => {
-        const matchesSearch = searchTerm === '' || Object.values(item).some(value => 
+        const matchesSearch = Object.values(item).some(value => 
             String(value).toLowerCase().includes(searchTerm)
         );
         const matchesProvince = !selectedProvince || item.province === selectedProvince;
@@ -119,3 +126,13 @@ document.getElementById('searchForm').addEventListener('submit', (e) => {
 
 // Initialize the data fetch when the page loads
 document.addEventListener('DOMContentLoaded', fetchData);
+
+// Add this helper function for XSS prevention
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
