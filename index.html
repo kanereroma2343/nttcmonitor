@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NTTCMIS</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -146,9 +146,9 @@
         }
     }
 
-    // Updated search event listener
-    document.getElementById('searchButton').addEventListener('click', function() {
-        const searchTerm = document.getElementById('searchInput').value;
+    // Updated search event listener for input field
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value;
         if (searchTerm !== lastSearchTerm) {
             lastSearchTerm = searchTerm;
             debounceSearch(searchTerm);
@@ -245,6 +245,71 @@
     padding: 5px 10px;
     font-size: 0.9em;
     cursor: pointer;
+}
+
+/* Responsive styles */
+.header-container, .button-container, .search-container, .container, .footer-content {
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.header-title {
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.logo {
+    width: 50px;
+    height: auto;
+}
+
+.action-button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+
+.search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#searchInput {
+    width: 100%;
+    padding: 10px;
+    padding-left: 30px;
+    box-sizing: border-box;
+}
+
+.search-button {
+    width: 100%;
+    margin-top: 10px;
+}
+
+@media (min-width: 768px) {
+    .action-button {
+        display: inline-block;
+        width: auto;
+        margin: 0 5px;
+    }
+
+    .search-container {
+        flex-direction: row;
+    }
+
+    .search-button {
+        width: auto;
+        margin-left: 10px;
+    }
 }
 </style>
 </body>
