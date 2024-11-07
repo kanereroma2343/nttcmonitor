@@ -12,6 +12,18 @@
     {
       "src": "*.css",
       "use": "@vercel/static"
+    },
+    {
+      "src": "*.json",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "icons/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "uploads/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -20,7 +32,23 @@
       "dest": "/index.html"
     },
     {
-      "src": "/(.+)",
+      "src": "/data.json",
+      "dest": "/data.json",
+      "headers": {
+        "cache-control": "no-cache",
+        "access-control-allow-origin": "*"
+      }
+    },
+    {
+      "src": "/icons/(.*)",
+      "dest": "/icons/$1"
+    },
+    {
+      "src": "/uploads/(.*)",
+      "dest": "/uploads/$1"
+    },
+    {
+      "src": "/(.+\\.(js|css|json|png|jpg|jpeg|gif|ico|svg))",
       "dest": "/$1"
     }
   ],
@@ -33,6 +61,10 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
         }
       ]
     }
