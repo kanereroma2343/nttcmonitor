@@ -1,0 +1,436 @@
+body {
+    background: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    color: #333;
+}
+
+/* Table Styles */
+.table-responsive {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    margin: 2.5rem auto;
+    border-radius: 16px;
+    max-width: 80%;
+    background: #ffffff;
+    border: none;
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    color: #2d3748;
+}
+
+.thead-dark {
+    background: linear-gradient(135deg, #1a237e, #000000);
+}
+
+.thead-dark th {
+    color: white;
+    border: none;
+    padding: 20px 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-align: left;
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.table tbody tr:hover {
+    background-color: #e3f2fd;
+    transform: scale(1.002);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.table td {
+    padding: 18px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    font-weight: 400;
+    vertical-align: middle;
+    transition: all 0.3s ease;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f5f8ff;
+}
+
+/* Header Styles */
+.header-container {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    margin-bottom: 40px;
+    width: 100%;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.header-title {
+    color: white;
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+    flex-grow: 1;
+    margin: 0;
+    letter-spacing: 0.5px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Button Styles */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-button {
+    padding: 14px 28px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    min-width: 150px;
+    text-decoration: none;
+}
+
+.action-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Logo Styles */
+.logo {
+    width: 120px;
+    height: auto;
+    margin: 0 50px;
+    transition: all 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+/* Search Styles */
+.search-container {
+    display: flex;
+    align-items: center;
+    max-width: 50%;
+    margin: 2.5rem auto;
+    background: #fff;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.search-container:focus-within {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.search-container .search-icon {
+    color: #666;
+    font-size: 1.2rem;
+    margin-right: 1rem;
+}
+
+.search-container input {
+    font-size: 16px;
+    padding: 12px 40px;
+    width: 100%;
+    border: none;
+    outline: none;
+    color: #333;
+    background: transparent;
+    padding: 0.5rem 0;
+}
+
+.search-container input::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* Pagination Styles */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 40px auto;
+    padding: 20px 0;
+    max-width: 50%;
+}
+
+.pagination {
+    display: inline-flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 10px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    width: 100%;
+   
+}
+
+.page-link {
+    padding: 14px 20px;
+    border: none;
+    color: #1a1a2e;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    background: #ffffff;
+    min-width: 45px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.page-link:hover {
+    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.page-link.active {
+    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+}
+
+/* Loader Animation */
+.loader {
+    display: none;
+    width: 24px;
+    height: 24px;
+    border: 3px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 3px solid #1a1a2e;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Media Queries */
+@media screen and (max-width: 1200px) {
+    .header-top {
+        padding: 20px;
+    }
+    
+    .button-container {
+        padding: 15px 20px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .table {
+        font-size: 12px;
+    }
+    
+    .thead-dark th {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+    
+    .table td {
+        padding: 8px 10px;
+    }
+    
+    .header-top {
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    .button-container {
+        flex-wrap: wrap;
+        padding: 10px 15px;
+    }
+    
+    .action-button {
+        min-width: calc(50% - 10px);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .table {
+        font-size: 11px;
+    }
+    
+    .thead-dark th {
+        padding: 8px;
+        font-size: 0.7rem;
+    }
+    
+    .table td {
+        padding: 6px 8px;
+    }
+    
+    .button-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .action-button {
+        min-width: 100%;
+    }
+}
+
+/* Table Styles */
+table {
+    width: 80%;
+    margin: 25px auto;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+thead tr {
+    background: linear-gradient(135deg, #1a237e, #000000);
+    color: #ffffff;
+    text-align: left;
+}
+
+th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #dddddd;
+}
+
+tbody tr {
+    border-bottom: 1px solid #dddddd;
+    transition: all 0.2s ease;
+}
+
+tbody tr:nth-of-type(even) {
+    background-color: #f5f8ff;
+}
+
+tbody tr:last-of-type {
+    border-bottom: 2px solid #1a237e;
+}
+
+tbody tr:hover {
+    background-color: #e3f2fd;
+    transform: scale(1.002);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer Styling */
+footer {
+    background-color: #333;
+    color: white;
+    padding: 20px 0;
+    margin-top: 40px;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #009879;
+}
+
+/* Responsive Table */
+@media screen and (max-width: 768px) {
+    table {
+        border: 0;
+    }
+
+    table thead {
+        display: none;
+    }
+
+    table tr {
+        margin-bottom: 15px;
+        display: block;
+        border-bottom: 2px solid #009879;
+    }
+
+    table td {
+        display: block;
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+    }
+
+    table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 50%;
+        padding-left: 15px;
+        font-weight: bold;
+        text-align: left;
+    }
+}
+
+/* Add some spacing around the table container */
+.container {
+    padding: 20px;
+    max-width: 100%;
+    overflow-x: auto;
+} 
