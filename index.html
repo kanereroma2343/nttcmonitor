@@ -31,6 +31,7 @@
         placeholder="Search throughout all pages..."
         autocomplete="off"
     >
+    <button id="clearSearch" class="clear-search" style="display: none;" onclick="clearSearch()">✕</button>
     <button id="searchButton" class="search-button">Search</button>
     <div id="searchStatus" class="search-status"></div>
 </div>
@@ -56,7 +57,6 @@
     </table>
 
     <div class="pagination">
-        <!-- Pagination buttons (JavaScript-based) -->
         <span id="pagination"></span>
     </div>
 </div>
@@ -73,21 +73,18 @@
 </footer>
 
 <script>
-    // Global variables for pagination and search
     const entriesPerPage = 200;
     let currentPage = 1;
     let filteredData = [];
     let originalData = [];
     let searchTimeout;
-    let isSearching = false;
     let lastSearchTerm = '';
 
-    // Fetch data from data.json and render it
     async function loadData() {
         try {
             const response = await fetch('data.json');
             const data = await response.json();
-            originalData = data.slice(4).filter(row => row.D || row.E); // Remove empty rows
+            originalData = data.slice(4).filter(row => row.D || row.E);
             filteredData = originalData;
             renderTable();
         } catch (error) {
@@ -96,136 +93,107 @@
         }
     }
 
-    // Debounced search function
     function debounceSearch(searchTerm) {
         clearTimeout(searchTimeout);
         const status = document.getElementById('searchStatus');
         status.textContent = 'Searching...';
-
         searchTimeout = setTimeout(() => {
             performSearch(searchTerm);
             status.textContent = '';
-        }, 300);
+        }, 250);
     }
 
-    // Perform the actual search
     function performSearch(searchTerm) {
         searchTerm = searchTerm.toLowerCase().trim();
-        isSearching = searchTerm.length > 0;
-        
-        if (!searchTerm) {
-            filteredData = originalData;
-        } else {
-            filteredData = originalData.filter(row => {
+        if (searchTerm === lastSearchTerm) return;
+
+        lastSearchTerm = searchTerm;
+        filteredData = searchTerm
+            ? originalData.filter(row => {
                 const searchFields = [
-                    row.D || '', // Last Name
-                    row.E || '', // First Name
-                    row.F || '', // Middle Name
-                    row.G || '', // Extension
-                    row.S || '', // Qualification
-                    row.AD || '', // Certificate Number
-                    row.AG || '', // Control Number
-                    row.AE || '', // Date of Issuance
-                    row.V || ''  // Validity
+                    row.D || '', row.E || '', row.F || '', row.G || '',
+                    row.S || '', row.AD || '', row.AG || '', row.AE || '', row.V || ''
                 ];
-                return searchFields.some(field => 
-                    field.toLowerCase().includes(searchTerm)
-                );
-            });
-        }
+                return searchFields.some(field => field.toLowerCase().includes(searchTerm));
+            })
+            : originalData;
 
         currentPage = 1;
         renderTable();
-        
-        // Update status message
-        const status = document.getElementById('searchStatus');
-        if (isSearching) {
-            status.textContent = `Found ${filteredData.length} results`;
-        } else {
-            status.textContent = '';
-        }
+        document.getElementById('searchStatus').textContent = `Found ${filteredData.length} results`;
+        document.getElementById('clearSearch').style.display = searchTerm ? 'inline' : 'none';
     }
 
-    // Updated search event listener for input field
+    function clearSearch() {
+        document.getElementById('searchInput').value = '';
+        lastSearchTerm = '';
+        filteredData = originalData;
+        renderTable();
+        document.getElementById('searchStatus').textContent = '';
+        document.getElementById('clearSearch').style.display = 'none';
+    }
+
     document.getElementById('searchInput').addEventListener('input', function() {
-        const searchTerm = this.value;
-        if (searchTerm !== lastSearchTerm) {
-            lastSearchTerm = searchTerm;
-            debounceSearch(searchTerm);
-        }
+        debounceSearch(this.value);
+    });
+    document.getElementById('searchButton').addEventListener('click', function() {
+        performSearch(document.getElementById('searchInput').value);
     });
 
-    // Function to render table based on current page and search
     function renderTable() {
         const startIndex = (currentPage - 1) * entriesPerPage;
         const paginatedData = filteredData.slice(startIndex, startIndex + entriesPerPage);
-        
         const tableBody = document.getElementById("data-table-body");
         tableBody.innerHTML = paginatedData.map(row => `
             <tr>
-                <td data-label="Last Name">${row.D || ''}</td>
-                <td data-label="First Name">${row.E || ''}</td>
-                <td data-label="Middle Name">${row.F || ''}</td>
-                <td data-label="Extension">${row.G || ''}</td>
-                <td data-label="Qualification">${row.S || ''}</td>
-                <td data-label="Certificate Number">${row.AD || ''}</td>
-                <td data-label="Control Number">${row.AG || ''}</td>
-                <td data-label="Date of Issuance">${row.AE || ''}</td>
-                <td data-label="Validity">${row.V || ''}</td>
+                <td>${row.D || ''}</td><td>${row.E || ''}</td><td>${row.F || ''}</td>
+                <td>${row.G || ''}</td><td>${row.S || ''}</td><td>${row.AD || ''}</td>
+                <td>${row.AG || ''}</td><td>${row.AE || ''}</td><td>${row.V || ''}</td>
             </tr>
         `).join("");
-
         renderPagination();
     }
 
-    // Function to render pagination
     function renderPagination() {
         const totalPages = Math.ceil(filteredData.length / entriesPerPage);
         const pagination = document.getElementById("pagination");
-        
         let paginationHTML = '';
-        
-        // Always show first page
+
         paginationHTML += `<a href="#" class="page-link ${1 === currentPage ? 'active' : ''}" onclick="setPage(1)">1</a>`;
-        
-        // Calculate range of pages to show
         let startPage = Math.max(2, currentPage - 2);
         let endPage = Math.min(totalPages - 1, currentPage + 2);
-        
-        // Add ellipsis after first page if needed
-        if (startPage > 2) {
-            paginationHTML += ' ... ';
-        }
-        
-        // Add pages in the middle
+        if (startPage > 2) paginationHTML += ' ... ';
         for (let i = startPage; i <= endPage; i++) {
             paginationHTML += `<a href="#" class="page-link ${i === currentPage ? 'active' : ''}" onclick="setPage(${i})">${i}</a>`;
         }
-        
-        // Add ellipsis before last page if needed
-        if (endPage < totalPages - 1) {
-            paginationHTML += ' ... ';
-        }
-        
-        // Always show last page if there is more than one page
-        if (totalPages > 1) {
-            paginationHTML += `<a href="#" class="page-link ${totalPages === currentPage ? 'active' : ''}" onclick="setPage(${totalPages})">${totalPages}</a>`;
-        }
-        
+        if (endPage < totalPages - 1) paginationHTML += ' ... ';
+        if (totalPages > 1) paginationHTML += `<a href="#" class="page-link ${totalPages === currentPage ? 'active' : ''}" onclick="setPage(${totalPages})">${totalPages}</a>`;
         pagination.innerHTML = paginationHTML;
     }
 
-    // Function to handle pagination click
     function setPage(page) {
         currentPage = page;
         renderTable();
     }
 
-    // Initialize data on page load
     loadData();
 </script>
 
 <style>
+/* Adjust styles for clear search button */
+.clear-search {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1em;
+    color: #aaa;
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+}
+
 .search-status {
     font-size: 0.9em;
     color: #666;
@@ -234,162 +202,6 @@
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-}
-
-.search-container {
-    position: relative;
-}
-
-.search-button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    font-size: 0.9em;
-    cursor: pointer;
-}
-
-/* Responsive styles */
-.header-container, .button-container, .search-container, .container, .footer-content {
-    padding: 10px;
-    box-sizing: border-box;
-}
-
-.header-title {
-    font-size: 1.5em;
-    text-align: center;
-}
-
-.logo {
-    width: 50px;
-    height: auto;
-}
-
-.action-button {
-    display: block;
-    width: 100%;
-    margin-bottom: 10px;
-    font-size: 1em;
-}
-
-.search-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.search-icon {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-#searchInput {
-    width: 100%;
-    padding: 10px;
-    padding-left: 30px;
-    box-sizing: border-box;
-}
-
-.search-button {
-    width: 100%;
-    margin-top: 10px;
-}
-
-@media (min-width: 768px) {
-    .action-button {
-        display: inline-block;
-        width: auto;
-        margin: 0 5px;
-    }
-
-    .search-container {
-        flex-direction: row;
-    }
-
-    .search-button {
-        width: auto;
-        margin-left: 10px;
-    }
-}
-
-/* Ensure table layout is consistent across all screen sizes */
-.container table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.container th, .container td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-.container th {
-    background-color: #f2f2f2;
-}
-
-/* Remove mobile-specific styles that change table layout */
-@media (max-width: 767px) {
-    .container table, .container th, .container td {
-        display: table;
-    }
-}
-
-/* New Table Styles */
-.table-responsive {
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-    margin: 2.5rem auto;
-    border-radius: 16px;
-    max-width: 1400px;
-    background: #ffffff;
-    border: none;
-    overflow: hidden;
-}
-
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
-    transition: all 0.3s ease;
-    color: #2d3748;
-}
-
-.thead-dark {
-    background: linear-gradient(135deg, #1a1a2e, #0f3460);
-}
-
-.thead-dark th {
-    color: white;
-    border: none;
-    padding: 20px 18px;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.95rem;
-    letter-spacing: 1px;
-    text-align: left;
-}
-
-.table tbody tr {
-    transition: all 0.3s ease;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.table tbody tr:hover {
-    background-color: #f8fafc;
-    transform: scale(1.002);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.table td {
-    padding: 18px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    font-weight: 400;
-    vertical-align: middle;
-    transition: all 0.3s ease;
-}
-
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: #f8f9fa;
 }
 </style>
 </body>
