@@ -1,84 +1,43 @@
-const DATA_URL = 'https://raw.githubusercontent.com/kanereroma2343/nttcmonitor/refs/heads/main/data.json';
+// fetch.js
 
-let certificationData = [];
-
+// Function to fetch data from the JSON URL
 async function fetchData() {
     try {
-        const response = await fetch(DATA_URL, {
-            cache: 'no-store'
-        });
-        
+        const response = await fetch('https://raw.githubusercontent.com/kanereroma2343/nttcmonitor/refs/heads/main/data.json');
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error('Network response was not ok');
         }
-        
         const data = await response.json();
-        if (!Array.isArray(data)) {
-            throw new Error('Data is not in the expected format');
-        }
-        
-        certificationData = data;
-        handleSearch();
+        displayData(data);
     } catch (error) {
-        console.error('Error fetching data:', error);
-        document.getElementById('resultsTable').innerHTML = `
-            <tr><td colspan="5" class="text-center text-danger">
-                Error loading data. Please try again later.
-            </td></tr>
-        `;
+        console.error('There was a problem with the fetch operation:', error);
     }
 }
 
-function formatName(record) {
-    const parts = [record.D, record.E];
-    if (record.F) parts.push(record.F);
-    if (record.G) parts.push(record.G);
-    return parts.filter(Boolean).join(' ').replace(/,\s*$/, '');
-}
+// Function to display data in the table
+function displayData(data) {
+    const tableBody = document.querySelector('table tbody');
+    tableBody.innerHTML = ''; // Clear previous data
 
-function highlightText(text, searchTerm) {
-    if (!searchTerm) return text;
-    const regex = new RegExp(`(${searchTerm})`, 'gi');
-    return text.replace(regex, '<span class="highlight">$1</span>');
-}
-
-function handleSearch() {
-    const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
-    
-    const filteredData = certificationData.filter(record => {
-        const name = formatName(record).toLowerCase();
-        const cert = record.S.toLowerCase();
-        const certNo = record.AG.toLowerCase();
-        return name.includes(searchTerm) || 
-               cert.includes(searchTerm) || 
-               certNo.includes(searchTerm);
+    // Filter and iterate over the data to insert rows in the table
+    data.slice(4).forEach(row => {
+        if (row['D'] || row['E']) { // Ensure row is not empty
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td data-label="Last Name">${row['D'] || ''}</td>
+                <td data-label="First Name">${row['E'] || ''}</td>
+                <td data-label="Middle Name">${row['F'] || ''}</td>
+                <td data-label="Extension">${row['G'] || ''}</td>
+                <td data-label="Qualification">${row['S'] || ''}</td>
+                <td data-label="Certificate Number">${row['AD'] || ''}</td>
+                <td data-label="Control Number">${row['AG'] || ''}</td>
+                <td data-label="Date of Issuance">${row['AE'] || ''}</td>
+                <td data-label="Validity">${row['V'] || ''}</td>
+            `;
+            tableBody.appendChild(tr);
+        }
     });
-
-    displayResults(filteredData, searchTerm);
 }
 
-function displayResults(results, searchTerm) {
-    const tbody = document.getElementById('resultsTable');
-    const countDiv = document.getElementById('resultsCount');
-    
-    countDiv.textContent = `Found ${results.length} record${results.length !== 1 ? 's' : ''}`;
-    
-    if (results.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center">No results found</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = results.map(record => `
-        <tr>
-            <td>${highlightText(formatName(record), searchTerm)}</td>
-            <td>${highlightText(record.S, searchTerm)}</td>
-            <td>${highlightText(record.AG, searchTerm)}</td>
-            <td>${record.V}</td>
-            <td>${record.AE}</td>
-        </tr>
-    `).join('');
-}
-
-// Initialize
-document.getElementById('searchInput').addEventListener('input', handleSearch);
-fetchData();
+// Call fetchData on page load
+window.addEventListener('load', fetchData);
