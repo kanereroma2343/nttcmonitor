@@ -28,7 +28,7 @@
     <input 
         type="search" 
         id="searchInput" 
-        placeholder="Search by name, qualification, or certificate number..."
+        placeholder="Search throughout all pages..."
         autocomplete="off"
     >
     <div id="searchStatus" class="search-status"></div>
@@ -78,6 +78,7 @@
     let filteredData = [];
     let originalData = [];
     let searchTimeout;
+    let isSearching = false;
 
     // Fetch data from data.json and render it
     async function loadData() {
@@ -108,26 +109,39 @@
     // Perform the actual search
     function performSearch(searchTerm) {
         searchTerm = searchTerm.toLowerCase().trim();
+        isSearching = searchTerm.length > 0;
         
         if (!searchTerm) {
             filteredData = originalData;
         } else {
-            filteredData = originalData.filter(row => 
-                (row.D || '').toLowerCase().includes(searchTerm) || // Last Name
-                (row.E || '').toLowerCase().includes(searchTerm) || // First Name
-                (row.F || '').toLowerCase().includes(searchTerm) || // Middle Name
-                (row.S || '').toLowerCase().includes(searchTerm) || // Qualification
-                (row.AD || '').toLowerCase().includes(searchTerm)   // Certificate Number
-            );
+            filteredData = originalData.filter(row => {
+                const searchFields = [
+                    row.D || '', // Last Name
+                    row.E || '', // First Name
+                    row.F || '', // Middle Name
+                    row.G || '', // Extension
+                    row.S || '', // Qualification
+                    row.AD || '', // Certificate Number
+                    row.AG || '', // Control Number
+                    row.AE || '', // Date of Issuance
+                    row.V || ''  // Validity
+                ];
+                return searchFields.some(field => 
+                    field.toLowerCase().includes(searchTerm)
+                );
+            });
         }
 
         currentPage = 1;
         renderTable();
         
-        // Show search results count
+        // Update status message
         const status = document.getElementById('searchStatus');
-        status.textContent = `Found ${filteredData.length} results`;
-        setTimeout(() => status.textContent = '', 2000);
+        if (isSearching) {
+            status.textContent = `Found ${filteredData.length} results`;
+        } else {
+            status.textContent = '';
+        }
     }
 
     // Updated search event listener
@@ -162,9 +176,37 @@
     function renderPagination() {
         const totalPages = Math.ceil(filteredData.length / entriesPerPage);
         const pagination = document.getElementById("pagination");
-        pagination.innerHTML = Array.from({length: totalPages}, (_, i) => i + 1)
-            .map(page => `<a href="#" class="page-link ${page === currentPage ? 'active' : ''}" onclick="setPage(${page})">${page}</a>`)
-            .join(" ");
+        
+        let paginationHTML = '';
+        
+        // Always show first page
+        paginationHTML += `<a href="#" class="page-link ${1 === currentPage ? 'active' : ''}" onclick="setPage(1)">1</a>`;
+        
+        // Calculate range of pages to show
+        let startPage = Math.max(2, currentPage - 2);
+        let endPage = Math.min(totalPages - 1, currentPage + 2);
+        
+        // Add ellipsis after first page if needed
+        if (startPage > 2) {
+            paginationHTML += ' ... ';
+        }
+        
+        // Add pages in the middle
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `<a href="#" class="page-link ${i === currentPage ? 'active' : ''}" onclick="setPage(${i})">${i}</a>`;
+        }
+        
+        // Add ellipsis before last page if needed
+        if (endPage < totalPages - 1) {
+            paginationHTML += ' ... ';
+        }
+        
+        // Always show last page if there is more than one page
+        if (totalPages > 1) {
+            paginationHTML += `<a href="#" class="page-link ${totalPages === currentPage ? 'active' : ''}" onclick="setPage(${totalPages})">${totalPages}</a>`;
+        }
+        
+        pagination.innerHTML = paginationHTML;
     }
 
     // Function to handle pagination click
