@@ -31,6 +31,7 @@
         placeholder="Search by name, qualification, or certificate number..."
         autocomplete="off"
     >
+    <div id="searchStatus" class="search-status"></div>
 </div>
 
 <div class="container">
@@ -71,22 +72,68 @@
 </footer>
 
 <script>
-    // Global variables for pagination
+    // Global variables for pagination and search
     const entriesPerPage = 200;
     let currentPage = 1;
     let filteredData = [];
+    let originalData = [];
+    let searchTimeout;
 
     // Fetch data from data.json and render it
     async function loadData() {
         try {
             const response = await fetch('data.json');
             const data = await response.json();
-            filteredData = data.slice(4).filter(row => row.D || row.E); // Remove empty rows
+            originalData = data.slice(4).filter(row => row.D || row.E); // Remove empty rows
+            filteredData = originalData;
             renderTable();
         } catch (error) {
             console.error("Error loading data:", error);
+            document.getElementById('searchStatus').textContent = 'Error loading data. Please try again.';
         }
     }
+
+    // Debounced search function
+    function debounceSearch(searchTerm) {
+        clearTimeout(searchTimeout);
+        const status = document.getElementById('searchStatus');
+        status.textContent = 'Searching...';
+
+        searchTimeout = setTimeout(() => {
+            performSearch(searchTerm);
+            status.textContent = '';
+        }, 300);
+    }
+
+    // Perform the actual search
+    function performSearch(searchTerm) {
+        searchTerm = searchTerm.toLowerCase().trim();
+        
+        if (!searchTerm) {
+            filteredData = originalData;
+        } else {
+            filteredData = originalData.filter(row => 
+                (row.D || '').toLowerCase().includes(searchTerm) || // Last Name
+                (row.E || '').toLowerCase().includes(searchTerm) || // First Name
+                (row.F || '').toLowerCase().includes(searchTerm) || // Middle Name
+                (row.S || '').toLowerCase().includes(searchTerm) || // Qualification
+                (row.AD || '').toLowerCase().includes(searchTerm)   // Certificate Number
+            );
+        }
+
+        currentPage = 1;
+        renderTable();
+        
+        // Show search results count
+        const status = document.getElementById('searchStatus');
+        status.textContent = `Found ${filteredData.length} results`;
+        setTimeout(() => status.textContent = '', 2000);
+    }
+
+    // Updated search event listener
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        debounceSearch(this.value);
+    });
 
     // Function to render table based on current page and search
     function renderTable() {
@@ -126,25 +173,24 @@
         renderTable();
     }
 
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        loadData().then(() => {
-            if (searchTerm) {
-                filteredData = filteredData.filter(row => 
-                    (row.D || '').toLowerCase().includes(searchTerm) ||
-                    (row.E || '').toLowerCase().includes(searchTerm) ||
-                    (row.S || '').toLowerCase().includes(searchTerm) ||
-                    (row.AD || '').toLowerCase().includes(searchTerm)
-                );
-            }
-            currentPage = 1;
-            renderTable();
-        });
-    });
-
     // Initialize data on page load
     loadData();
 </script>
+
+<style>
+.search-status {
+    font-size: 0.9em;
+    color: #666;
+    margin-left: 10px;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.search-container {
+    position: relative;
+}
+</style>
 </body>
 </html>
