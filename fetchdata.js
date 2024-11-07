@@ -10,7 +10,7 @@ async function fetchData() {
     tableBody.innerHTML = loadingMessage;
     
     try {
-        const response = await fetch('https://raw.githubusercontent.com/kanereroma2343/nttcmonitor/refs/heads/main/data.json');
+        const response = await fetch('data.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
