@@ -6,7 +6,7 @@ let filteredData = [];
 // Fetch data from output.json
 async function fetchData() {
     try {
-        const response = await fetch('output.json');
+        const response = await fetch(https://raw.githubusercontent.com/kanereroma2343/nttcmonitor/refs/heads/main/data.json');
         if (!response.ok) {
             throw new Error('Failed to fetch data');
         }
