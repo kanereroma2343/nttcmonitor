@@ -1,138 +1,84 @@
-let currentPage = 1;
-const rowsPerPage = 10;
-let allData = [];
-let filteredData = [];
+const DATA_URL = 'https://raw.githubusercontent.com/kanereroma2343/nttcmonitor/refs/heads/main/data.json';
 
-// Fetch data from output.json
+let certificationData = [];
+
 async function fetchData() {
-    const tableBody = document.getElementById('tableBody');
-    tableBody.innerHTML = '<tr><td colspan="9">Loading data...</td></tr>';
-    
     try {
-        const response = await fetch('data.json', {
-            headers: {
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache'
-            }
+        const response = await fetch(DATA_URL, {
+            cache: 'no-store'
         });
+        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        allData = await response.json();
         
-        // Validate data is an array
-        if (!Array.isArray(allData)) {
-            throw new Error('Invalid data format');
+        const data = await response.json();
+        if (!Array.isArray(data)) {
+            throw new Error('Data is not in the expected format');
         }
         
-        filteredData = [...allData];
-        
-        // Initialize the UI components
-        populateProvinceDropdown();
-        displayData();
-        setupPagination();
+        certificationData = data;
+        handleSearch();
     } catch (error) {
-        console.error('Error:', error);
-        tableBody.innerHTML = `<tr><td colspan="9">Error loading data: ${error.message}</td></tr>`;
+        console.error('Error fetching data:', error);
+        document.getElementById('resultsTable').innerHTML = `
+            <tr><td colspan="5" class="text-center text-danger">
+                Error loading data. Please try again later.
+            </td></tr>
+        `;
     }
 }
 
-// Populate province dropdown with unique values
-function populateProvinceDropdown() {
-    const provinces = [...new Set(allData.map(item => item.province))].sort();
-    const provinceSelect = document.getElementById('provinceSelect');
-    provinces.forEach(province => {
-        const option = document.createElement('option');
-        option.value = province;
-        option.textContent = province;
-        provinceSelect.appendChild(option);
-    });
+function formatName(record) {
+    const parts = [record.D, record.E];
+    if (record.F) parts.push(record.F);
+    if (record.G) parts.push(record.G);
+    return parts.filter(Boolean).join(' ').replace(/,\s*$/, '');
 }
 
-// Display data with pagination
-function displayData() {
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    const tableBody = document.getElementById('tableBody');
+function highlightText(text, searchTerm) {
+    if (!searchTerm) return text;
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    return text.replace(regex, '<span class="highlight">$1</span>');
+}
+
+function handleSearch() {
+    const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
     
-    tableBody.innerHTML = '';
+    const filteredData = certificationData.filter(record => {
+        const name = formatName(record).toLowerCase();
+        const cert = record.S.toLowerCase();
+        const certNo = record.AG.toLowerCase();
+        return name.includes(searchTerm) || 
+               cert.includes(searchTerm) || 
+               certNo.includes(searchTerm);
+    });
+
+    displayResults(filteredData, searchTerm);
+}
+
+function displayResults(results, searchTerm) {
+    const tbody = document.getElementById('resultsTable');
+    const countDiv = document.getElementById('resultsCount');
     
-    if (filteredData.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="9">No results found</td></tr>';
+    countDiv.textContent = `Found ${results.length} record${results.length !== 1 ? 's' : ''}`;
+    
+    if (results.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center">No results found</td></tr>';
         return;
     }
-    
-    const fragment = document.createDocumentFragment();
-    
-    filteredData.slice(startIndex, endIndex).forEach(item => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${escapeHtml(item.lastName || '')}</td>
-            <td>${escapeHtml(item.firstName || '')}</td>
-            <td>${escapeHtml(item.middleName || '')}</td>
-            <td>${escapeHtml(item.extension || '')}</td>
-            <td>${escapeHtml(item.qualification || '')}</td>
-            <td>${escapeHtml(item.certificateNumber || '')}</td>
-            <td>${escapeHtml(item.controlNumber || '')}</td>
-            <td>${escapeHtml(item.dateOfIssuance || '')}</td>
-            <td>${escapeHtml(item.validity || '')}</td>
-        `;
-        fragment.appendChild(row);
-    });
-    
-    tableBody.appendChild(fragment);
+
+    tbody.innerHTML = results.map(record => `
+        <tr>
+            <td>${highlightText(formatName(record), searchTerm)}</td>
+            <td>${highlightText(record.S, searchTerm)}</td>
+            <td>${highlightText(record.AG, searchTerm)}</td>
+            <td>${record.V}</td>
+            <td>${record.AE}</td>
+        </tr>
+    `).join('');
 }
 
-// Setup pagination
-function setupPagination() {
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-    const paginationElement = document.getElementById('pagination');
-    paginationElement.innerHTML = '';
-
-    for (let i = 1; i <= totalPages; i++) {
-        const button = document.createElement('button');
-        button.classList.add('pagination-button');
-        if (i === currentPage) {
-            button.classList.add('active');
-        }
-        button.textContent = i;
-        button.addEventListener('click', () => {
-            currentPage = i;
-            displayData();
-            setupPagination();
-        });
-        paginationElement.appendChild(button);
-    }
-}
-
-// Search functionality
-document.getElementById('searchForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const selectedProvince = document.getElementById('provinceSelect').value;
-
-    filteredData = allData.filter(item => {
-        const matchesSearch = Object.values(item).some(value => 
-            String(value).toLowerCase().includes(searchTerm)
-        );
-        const matchesProvince = !selectedProvince || item.province === selectedProvince;
-        return matchesSearch && matchesProvince;
-    });
-
-    currentPage = 1;
-    displayData();
-    setupPagination();
-});
-
-// Initialize the data fetch when the page loads
-document.addEventListener('DOMContentLoaded', fetchData);
-
-// Add this helper function for XSS prevention
-function escapeHtml(unsafe) {
-    return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+// Initialize
+document.getElementById('searchInput').addEventListener('input', handleSearch);
+fetchData();
