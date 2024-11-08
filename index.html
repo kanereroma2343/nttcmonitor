@@ -200,6 +200,7 @@
     position: relative;
     width: 100%;
     padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .search-wrapper {
@@ -257,13 +258,28 @@
 
 /* Add media query for mobile responsiveness */
 @media (max-width: 600px) {
+    .search-container {
+        padding: 0 10px;
+    }
+    
     .search-wrapper {
         flex-direction: column;
         gap: 10px;
+        width: 100%;
     }
     
-    #searchInput, #searchButton {
+    #searchInput {
         width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 12px 20px;
+    }
+    
+    #searchButton {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 12px 20px;
     }
 }
 </style>
