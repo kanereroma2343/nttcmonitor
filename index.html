@@ -83,13 +83,22 @@
     async function loadData() {
         try {
             const response = await fetch('data.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const data = await response.json();
-            originalData = data.slice(4).filter(row => row.D || row.E);
+            if (!Array.isArray(data)) {
+                throw new Error('Invalid data format');
+            }
+            originalData = data.slice(4).filter(row => row && (row.D || row.E));
             filteredData = originalData;
             renderTable();
         } catch (error) {
             console.error("Error loading data:", error);
             document.getElementById('searchStatus').textContent = 'Error loading data. Please try again.';
+            originalData = [];
+            filteredData = [];
+            renderTable();
         }
     }
 
@@ -97,32 +106,54 @@
         clearTimeout(searchTimeout);
         const status = document.getElementById('searchStatus');
         status.textContent = 'Searching...';
+        
         searchTimeout = setTimeout(() => {
-            performSearch(searchTerm);
-            status.textContent = '';
-        }, 250);
+            requestAnimationFrame(() => {
+                performSearch(searchTerm);
+                status.textContent = '';
+            });
+        }, 300);
     }
 
     function performSearch(searchTerm) {
+        if (!originalData.length) return;
+        
         searchTerm = searchTerm.toLowerCase().trim();
         if (searchTerm === lastSearchTerm) return;
 
         lastSearchTerm = searchTerm;
-        filteredData = searchTerm
-            ? originalData.filter(row => {
+        
+        if (!searchTerm) {
+            filteredData = originalData;
+        } else {
+            const searchTerms = searchTerm.split(' ').filter(term => term.length > 0);
+            filteredData = originalData.filter(row => {
                 const searchFields = [
-                    row.D || '', row.E || '', row.F || '', row.G || '',
-                    row.S || '', row.AD || '', row.AG || '', row.AE || '', row.V || ''
-                ];
-                return searchFields.some(field => field.toLowerCase().includes(searchTerm));
-            })
-            : originalData;
+                    row.D, row.E, row.F, row.G,
+                    row.S, row.AD, row.AG, row.AE, row.V
+                ].map(field => (field || '').toLowerCase());
+                
+                return searchTerms.every(term =>
+                    searchFields.some(field => field.includes(term))
+                );
+            });
+        }
 
         currentPage = 1;
         renderTable();
-        document.getElementById('searchStatus').textContent = `Found ${filteredData.length} results`;
+        
+        const status = document.getElementById('searchStatus');
+        status.textContent = searchTerm ? `Found ${filteredData.length} results` : '';
         document.getElementById('clearSearch').style.display = searchTerm ? 'inline' : 'none';
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        searchInput.form?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            performSearch(searchInput.value);
+        });
+    });
 
     function clearSearch() {
         document.getElementById('searchInput').value = '';
