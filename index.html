@@ -27,10 +27,10 @@
     <!-- Search Input Field -->
     <div class="search-container">
         <div class="search-wrapper">
-            <input type="text" id="searchInput" placeholder="Search records..." oninput="searchTable()">
             <button id="searchButton" onclick="searchTable()">
                 <i class="fas fa-search"></i> Search
             </button>
+            <input type="text" id="searchInput" placeholder="Search records..." oninput="searchTable()">
         </div>
     </div>
 
@@ -204,6 +204,7 @@
 .search-wrapper {
     position: relative;
     display: flex;
+    flex-direction: row;
     align-items: center;
     background: #f8f9fa;
     border-radius: 50px;
@@ -232,7 +233,7 @@
 }
 
 #searchButton {
-    margin-right: 5px;
+    margin-left: 5px;
     padding: 12px 30px;
     border: none;
     border-radius: 25px;
@@ -261,7 +262,7 @@
     }
 
     .search-wrapper {
-        flex-direction: column;
+        flex-direction: column-reverse;
         background: transparent;
         box-shadow: none;
         gap: 10px;
