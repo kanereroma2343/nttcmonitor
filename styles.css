@@ -11,7 +11,7 @@ body {
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
     margin: 2.5rem auto;
     border-radius: 16px;
-    max-width: 1400px;
+    max-width: 80%;
     background: #ffffff;
     border: none;
     overflow: hidden;
@@ -26,7 +26,7 @@ body {
 }
 
 .thead-dark {
-    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    background: linear-gradient(135deg, #1a237e, #000000);
 }
 
 .thead-dark th {
@@ -46,7 +46,7 @@ body {
 }
 
 .table tbody tr:hover {
-    background-color: #f8fafc;
+    background-color: #e3f2fd;
     transform: scale(1.002);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
@@ -60,7 +60,7 @@ body {
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
-    background-color: #f8f9fa;
+    background-color: #f5f8ff;
 }
 
 /* Header Styles */
@@ -130,9 +130,9 @@ body {
 
 /* Logo Styles */
 .logo {
-    width: 90px;
+    width: 120px;
     height: auto;
-    margin: 0 15px;
+    margin: 0 50px;
     transition: all 0.3s ease;
 }
 
@@ -142,83 +142,94 @@ body {
 
 /* Search Styles */
 .search-container {
-    margin: 20px auto;
-    max-width: 1400px;
     display: flex;
-    gap: 15px;
     align-items: center;
-    background: white;
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    max-width: 50%;
+    margin: 2.5rem auto;
+    background: #fff;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
-.search-input {
-    padding: 16px 24px;
+.search-container:focus-within {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.search-container .search-icon {
+    color: #666;
+    font-size: 1.2rem;
+    margin-right: 1rem;
+}
+
+.search-container input {
     font-size: 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    background-color: #f8fafc;
+    padding: 12px 40px;
+    width: 100%;
+    border: none;
+    outline: none;
+    color: #333;
+    background: transparent;
+    padding: 0.5rem 0;
 }
 
-.search-button {
-    padding: 16px 32px;
-    background: linear-gradient(135deg, #1a1a2e, #0f3460);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    min-width: 120px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: center;
+.search-container input::placeholder {
+    color: #999;
+    font-style: italic;
 }
 
 /* Pagination Styles */
 .pagination-container {
-    text-align: center;
-    margin: 40px 0;
-    padding: 20px;
-    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 40px auto;
+    padding: 20px 0;
+    max-width: 50%;
 }
 
 .pagination {
     display: inline-flex;
-    gap: 8px;
+    gap: 12px;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
+    padding: 10px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    width: 100%;
+   
 }
 
 .page-link {
-    padding: 12px 18px;
-    border: 2px solid #e2e8f0;
+    padding: 14px 20px;
+    border: none;
     color: #1a1a2e;
     text-decoration: none;
-    border-radius: 10px;
+    border-radius: 12px;
     transition: all 0.3s ease;
     font-weight: 600;
     background: #ffffff;
     min-width: 45px;
     text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .page-link:hover {
     background: linear-gradient(135deg, #1a1a2e, #0f3460);
     color: #ffffff;
     transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
 
 .page-link.active {
     background: linear-gradient(135deg, #1a1a2e, #0f3460);
     color: #ffffff;
-    border: none;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
 }
 
 /* Loader Animation */
@@ -305,4 +316,121 @@ body {
     .action-button {
         min-width: 100%;
     }
+}
+
+/* Table Styles */
+table {
+    width: 80%;
+    margin: 25px auto;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+thead tr {
+    background: linear-gradient(135deg, #1a237e, #000000);
+    color: #ffffff;
+    text-align: left;
+}
+
+th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #dddddd;
+}
+
+tbody tr {
+    border-bottom: 1px solid #dddddd;
+    transition: all 0.2s ease;
+}
+
+tbody tr:nth-of-type(even) {
+    background-color: #f5f8ff;
+}
+
+tbody tr:last-of-type {
+    border-bottom: 2px solid #1a237e;
+}
+
+tbody tr:hover {
+    background-color: #e3f2fd;
+    transform: scale(1.002);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer Styling */
+footer {
+    background-color: #333;
+    color: white;
+    padding: 20px 0;
+    margin-top: 40px;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #009879;
+}
+
+/* Responsive Table */
+@media screen and (max-width: 768px) {
+    table {
+        border: 0;
+    }
+
+    table thead {
+        display: none;
+    }
+
+    table tr {
+        margin-bottom: 15px;
+        display: block;
+        border-bottom: 2px solid #009879;
+    }
+
+    table td {
+        display: block;
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+    }
+
+    table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 50%;
+        padding-left: 15px;
+        font-weight: bold;
+        text-align: left;
+    }
+}
+
+/* Add some spacing around the table container */
+.container {
+    padding: 20px;
+    max-width: 100%;
+    overflow-x: auto;
 } 
