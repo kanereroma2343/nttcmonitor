@@ -190,15 +190,20 @@
         const pagination = document.getElementById("pagination");
         let paginationHTML = '';
 
-        paginationHTML += `<a href="#" class="page-link ${1 === currentPage ? 'active' : ''}" onclick="setPage(1)">1</a>`;
-        let startPage = Math.max(2, currentPage - 2);
-        let endPage = Math.min(totalPages - 1, currentPage + 2);
-        if (startPage > 2) paginationHTML += ' ... ';
-        for (let i = startPage; i <= endPage; i++) {
-            paginationHTML += `<a href="#" class="page-link ${i === currentPage ? 'active' : ''}" onclick="setPage(${i})">${i}</a>`;
+        // Previous button
+        paginationHTML += `<a href="#" class="page-link ${currentPage === 1 ? 'disabled' : ''}" 
+            onclick="setPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</a>`;
+
+        // Show all page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            paginationHTML += `<a href="#" class="page-link ${i === currentPage ? 'active' : ''}" 
+                onclick="setPage(${i})">${i}</a>`;
         }
-        if (endPage < totalPages - 1) paginationHTML += ' ... ';
-        if (totalPages > 1) paginationHTML += `<a href="#" class="page-link ${totalPages === currentPage ? 'active' : ''}" onclick="setPage(${totalPages})">${totalPages}</a>`;
+
+        // Next button
+        paginationHTML += `<a href="#" class="page-link ${currentPage === totalPages ? 'disabled' : ''}" 
+            onclick="setPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</a>`;
+
         pagination.innerHTML = paginationHTML;
     }
 
@@ -233,6 +238,30 @@
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
+}
+
+.pagination {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.page-link {
+    padding: 8px 12px;
+    margin: 0 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+}
+
+.page-link.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.page-link.disabled {
+    pointer-events: none;
+    color: #ccc;
 }
 </style>
 </body>
