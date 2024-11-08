@@ -1,46 +1,118 @@
-const express = require('express');
-const multer = require('multer');
-const XLSX = require('xlsx');
-const cors = require('cors');
-const path = require('path');
+document.addEventListener('DOMContentLoaded', () => {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const uploadForm = document.getElementById('uploadForm');
+    const progressBar = document.getElementById('progressBar');
+    const progress = document.getElementById('progress');
+    const status = document.getElementById('status');
 
-const app = express();
-const port = 3000;
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
 
-// Enable CORS
-app.use(cors());
+    // Highlight drop zone when dragging over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
 
-// Serve static files from the current directory
-app.use(express.static('./'));
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
 
-// Configure multer for file upload
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+    // Handle dropped files
+    dropZone.addEventListener('drop', handleDrop, false);
 
-// Handle the /convert endpoint
-app.post('/convert', upload.single('excelFile'), (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded' });
+    // Handle file input change
+    fileInput.addEventListener('change', handleFiles);
+
+    // Handle form submission
+    uploadForm.addEventListener('submit', handleSubmit);
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight(e) {
+        dropZone.classList.add('hover');
+    }
+
+    function unhighlight(e) {
+        dropZone.classList.remove('hover');
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        fileInput.files = files;
+        handleFiles();
+    }
+
+    function handleFiles() {
+        const file = fileInput.files[0];
+        if (file) {
+            status.textContent = `Selected file: ${file.name}`;
+        }
+    }
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        const file = fileInput.files[0];
+        
+        if (!file) {
+            status.textContent = 'Please select a file first.';
+            return;
         }
 
-        // Read the Excel file
-        const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
-        
-        // Convert to JSON
-        const result = {};
-        workbook.SheetNames.forEach(sheetName => {
-            const worksheet = workbook.Sheets[sheetName];
-            result[sheetName] = XLSX.utils.sheet_to_json(worksheet);
-        });
+        if (!file.name.match(/\.(xlsx|xls)$/)) {
+            status.textContent = 'Please select an Excel file (.xlsx or .xls)';
+            return;
+        }
 
-        res.json(result);
-    } catch (error) {
-        console.error('Conversion error:', error);
-        res.status(500).json({ error: 'Error converting file' });
+        const formData = new FormData();
+        formData.append('excelFile', file);
+
+        try {
+            progressBar.style.display = 'block';
+            status.textContent = 'Converting...';
+
+            const response = await fetch('/convert', {
+                method: 'POST',
+                body: formData,
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    progress.style.width = percentCompleted + '%';
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            
+            // Create and trigger download of JSON file
+            const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = file.name.replace(/\.(xlsx|xls)$/, '.json');
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            status.textContent = 'Conversion completed! JSON file downloaded.';
+        } catch (error) {
+            console.error('Error:', error);
+            status.textContent = 'Error during conversion. Please try again.';
+        } finally {
+            progress.style.width = '0%';
+            setTimeout(() => {
+                progressBar.style.display = 'none';
+            }, 1000);
+        }
     }
-});
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
 });
