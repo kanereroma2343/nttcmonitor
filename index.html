@@ -15,7 +15,7 @@
         <img src="./icons/blogo.png" alt="Right Logo" class="logo">
     </div>
     <div class="button-container">
-        <button onclick="window.location.href='index.html'" class="action-button">Home</button>
+        <button onclick="window.location.href='../dashboard.php'" class="action-button">Home</button>
         <button onclick="window.location.href='uploadxls.php'" class="action-button">Upload Registry</button>
         <button onclick="window.location.href='deletexls.php'" class="action-button">Delete Registry</button>
         <button class="action-button">Export Data</button>
@@ -24,10 +24,15 @@
 </div>
 
 <div class="container">
+    <!-- Date Subheader -->
+    <div class="date-subheader">
+        As of: <span id="currentDate"></span>
+    </div>
+
     <!-- Search Input Field -->
     <div class="search-container">
         <div class="search-wrapper">
-            <input type="text" id="searchInput" placeholder="Search Name, Qualification, Date of Issuances and etc..." oninput="searchTable()">
+            <input type="text" id="searchInput" placeholder="Search records..." oninput="searchTable()">
             <button id="searchButton" onclick="searchTable()">
                 <i class="fas fa-search"></i>
             </button>
@@ -62,7 +67,7 @@
     <div class="footer-content">
         <p>&copy; 2024 Certificate Records Management System</p>
         <div class="footer-links">
-            <a href="#"><i class="fas fa-home"></i> Home</a>
+            <a href="index.html"><i class="fas fa-home"></i> Home</a>
             <a href="#"><i class="fas fa-info-circle"></i> About</a>
             <a href="#"><i class="fas fa-envelope"></i> Contact</a>
         </div>
@@ -167,6 +172,13 @@
     }
 
     loadData();
+
+    // Add this after loadData();
+    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
 </script>
 
 <style>
@@ -279,6 +291,14 @@
         top: 50%;
         transform: translateY(-50%);
     }
+}
+
+.date-subheader {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    color: #1a5f7a;
+    font-weight: 500;
 }
 </style>
 </body>
