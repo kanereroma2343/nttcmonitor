@@ -11,7 +11,7 @@
 <div class="header-container">
     <div class="header-top">
         <img src="./icons/tlogo.png" alt="Left Logo" class="logo">
-        <h1 class="header-title">REGION VII - NATIONAL TVET TRAINER'S CERTIFICATE RECORDS</h1>
+        <h1 class="header-title">NATIONAL TVET TRAINER'S CERTIFICATE RECORDS</h1>
         <img src="./icons/blogo.png" alt="Right Logo" class="logo">
     </div>
     <div class="button-container">
@@ -60,9 +60,9 @@
 
 <footer>
     <div class="footer-content">
-        <p>&copy; 2024 NTTC Monitoring and Information System</p>
+        <p>&copy; 2024 Certificate Records Management System</p>
         <div class="footer-links">
-            <a href="https://www.facebook.com/TESDARegion7"><i class="fas fa-home"></i> Facebook Page</a>
+            <a href="#"><i class="fas fa-home"></i> Home</a>
             <a href="#"><i class="fas fa-info-circle"></i> About</a>
             <a href="#"><i class="fas fa-envelope"></i> Contact</a>
         </div>
@@ -100,13 +100,36 @@
         const startIndex = (currentPage - 1) * entriesPerPage;
         const paginatedData = filteredData.slice(startIndex, startIndex + entriesPerPage);
         const tableBody = document.getElementById("data-table-body");
-        tableBody.innerHTML = paginatedData.map(row => `
-            <tr>
-                <td>${row.D || ''}</td><td>${row.E || ''}</td><td>${row.F || ''}</td>
-                <td>${row.G || ''}</td><td>${row.S || ''}</td><td>${row.AD || ''}</td>
-                <td>${row.AG || ''}</td><td>${row.AE || ''}</td><td>${row.V || ''}</td>
-            </tr>
-        `).join("");
+        
+        tableBody.innerHTML = paginatedData.map(row => {
+            // Parse the validity date
+            const validityDate = new Date(row.V);
+            const today = new Date();
+            const threeMonthsFromNow = new Date();
+            threeMonthsFromNow.setMonth(today.getMonth() + 3);
+            
+            // Determine the validity status and color
+            let validityColor = 'green'; // Active dates are green
+            if (validityDate < today) {
+                validityColor = 'red'; // Expired
+            } else if (validityDate <= threeMonthsFromNow) {
+                validityColor = 'orange'; // Expiring soon (within 3 months)
+            }
+
+            return `
+                <tr>
+                    <td>${row.D || ''}</td>
+                    <td>${row.E || ''}</td>
+                    <td>${row.F || ''}</td>
+                    <td>${row.G || ''}</td>
+                    <td>${row.S || ''}</td>
+                    <td>${row.AD || ''}</td>
+                    <td>${row.AG || ''}</td>
+                    <td>${row.AE || ''}</td>
+                    <td style="color: ${validityColor}">${row.V || ''}</td>
+                </tr>
+            `;
+        }).join("");
         renderPagination();
     }
 
