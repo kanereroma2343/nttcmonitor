@@ -26,7 +26,12 @@
 <div class="container">
     <!-- Search Input Field -->
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search records..." oninput="searchTable()">
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" placeholder="Search records..." oninput="searchTable()">
+            <button id="searchButton" onclick="searchTable()">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
     </div>
 
     <table>
@@ -173,10 +178,19 @@
     width: 100%;
 }
 
+.search-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
 #searchInput {
+    flex: 1;
     padding: 12px 20px;
-    width: 80%;
-    max-width: 500px;
     border: 2px solid #ddd;
     border-radius: 25px;
     font-size: 16px;
@@ -184,15 +198,22 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-#searchInput:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 2px 8px rgba(0,123,255,0.2);
+#searchButton {
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-#searchInput::placeholder {
-    color: #999;
-    font-style: italic;
+#searchButton:hover {
+    background-color: #0056b3;
 }
 </style>
 </body>
