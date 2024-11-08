@@ -24,6 +24,11 @@
 </div>
 
 <div class="container">
+    <!-- Search Input Field -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search records..." oninput="searchTable()">
+    </div>
+
     <table>
         <thead>
             <tr>
@@ -88,7 +93,7 @@
 
     function renderTable() {
         const startIndex = (currentPage - 1) * entriesPerPage;
-        const paginatedData = originalData.slice(startIndex, startIndex + entriesPerPage);
+        const paginatedData = filteredData.slice(startIndex, startIndex + entriesPerPage);
         const tableBody = document.getElementById("data-table-body");
         tableBody.innerHTML = paginatedData.map(row => `
             <tr>
@@ -101,21 +106,18 @@
     }
 
     function renderPagination() {
-        const totalPages = Math.ceil(originalData.length / entriesPerPage);
+        const totalPages = Math.ceil(filteredData.length / entriesPerPage);
         const pagination = document.getElementById("pagination");
         let paginationHTML = '';
 
-        // Previous button
         paginationHTML += `<a href="#" class="page-link ${currentPage === 1 ? 'disabled' : ''}" 
             onclick="setPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</a>`;
 
-        // Show all page numbers
         for (let i = 1; i <= totalPages; i++) {
             paginationHTML += `<a href="#" class="page-link ${i === currentPage ? 'active' : ''}" 
                 onclick="setPage(${i})">${i}</a>`;
         }
 
-        // Next button
         paginationHTML += `<a href="#" class="page-link ${currentPage === totalPages ? 'disabled' : ''}" 
             onclick="setPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</a>`;
 
@@ -124,6 +126,15 @@
 
     function setPage(page) {
         currentPage = page;
+        renderTable();
+    }
+
+    function searchTable() {
+        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        filteredData = originalData.filter(row =>
+            Object.values(row).some(value => value && value.toString().toLowerCase().includes(searchTerm))
+        );
+        currentPage = 1; 
         renderTable();
     }
 
@@ -153,6 +164,19 @@
 .page-link.disabled {
     pointer-events: none;
     color: #ccc;
+}
+
+.search-container {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#searchInput {
+    padding: 8px;
+    width: 80%;
+    max-width: 500px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 </style>
 </body>
