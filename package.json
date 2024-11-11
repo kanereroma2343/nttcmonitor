@@ -1,0 +1,14 @@
+{
+    "name": "excel-to-json-converter",
+    "version": "1.0.0",
+    "description": "Excel to JSON converter with file upload",
+    "main": "server.js",
+    "dependencies": {
+      "express": "^4.17.1",
+      "multer": "^1.4.2",
+      "xlsx": "^0.18.5"
+    },
+    "scripts": {
+      "start": "node server.js"
+    }
+  }
