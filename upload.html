@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Excel to JSON Converter</title>
     <link rel="icon" type="image/png" href="./icons/nttcmis.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -117,11 +119,11 @@
 <body>
     <div class="container">
         <h2>Excel to JSON Converter</h2>
-        <form id="uploadForm">
-            <div class="upload-area" id="dropZone">
+        <form id="uploadForm" onsubmit="return handleFormSubmit(event)">
+            <div class="upload-area" id="dropZone" onclick="document.getElementById('fileInput').click()">
                 <p>Drag & Drop your Excel file here or</p>
-                <input type="file" id="fileInput" name="excelFile" accept=".xlsx,.xls" required>
-                <button type="button" class="btn" onclick="document.getElementById('fileInput').click()">Choose File</button>
+                <input type="file" id="fileInput" name="excelFile" accept=".xlsx,.xls" required onchange="handleFileSelect(event)">
+                <button type="button" class="btn">Choose File</button>
             </div>
             <div class="progress-bar" id="progressBar">
                 <div class="progress" id="progress"></div>
@@ -130,6 +132,61 @@
         </form>
         <div id="status"></div>
     </div>
-    <script src="script.js"></script>
+    <script>
+        document.getElementById('dropZone').addEventListener('dragover', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.classList.add('dragging');
+        });
+
+        document.getElementById('dropZone').addEventListener('dragleave', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.classList.remove('dragging');
+        });
+
+        document.getElementById('dropZone').addEventListener('drop', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.classList.remove('dragging');
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('fileInput').files = files;
+                handleFileSelect(event);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length > 0) {
+                document.getElementById('status').innerText = `Selected file: ${fileInput.files[0].name}`;
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const progressBar = document.getElementById('progressBar');
+            const progress = document.getElementById('progress');
+            const status = document.getElementById('status');
+            
+            // Reset the progress bar
+            progressBar.style.display = 'block';
+            progress.style.width = '0%';
+            status.innerText = 'Converting...';
+            
+            // Simulate the progress (for demonstration purposes)
+            let progressValue = 0;
+            const interval = setInterval(() => {
+                progressValue += 10;
+                progress.style.width = `${progressValue}%`;
+                if (progressValue >= 100) {
+                    clearInterval(interval);
+                    status.innerText = 'Conversion complete!';
+                }
+            }, 300);
+            
+            // Implement actual file upload and conversion logic here
+        }
+    </script>
 </body>
 </html>
