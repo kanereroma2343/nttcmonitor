@@ -174,18 +174,43 @@
             progress.style.width = '0%';
             status.innerText = 'Converting...';
             
-            // Simulate the progress (for demonstration purposes)
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            // Create FormData and append file
+            const formData = new FormData();
+            formData.append('excelFile', file);
+            
+            // Simulate the progress while processing
             let progressValue = 0;
             const interval = setInterval(() => {
                 progressValue += 10;
                 progress.style.width = `${progressValue}%`;
                 if (progressValue >= 100) {
                     clearInterval(interval);
-                    status.innerText = 'Conversion complete!';
+                    
+                    // Ask user if they want to update data.json
+                    const shouldUpdate = confirm('Conversion complete! Would you like to update data.json with the converted data?');
+                    
+                    if (shouldUpdate) {
+                        status.innerText = 'Updating data.json...';
+                        // Add your API call here to update data.json
+                        fetch('/api/update-json', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            status.innerText = 'data.json has been updated successfully!';
+                        })
+                        .catch(error => {
+                            status.innerText = 'Error updating data.json: ' + error.message;
+                        });
+                    } else {
+                        status.innerText = 'Conversion complete! (data.json was not updated)';
+                    }
                 }
             }, 300);
-            
-            // Implement actual file upload and conversion logic here
         }
     </script>
 </body>
