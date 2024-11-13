@@ -4,27 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NTTCMIS</title>
-    <link rel="icon" type="icons/png" href="../icons/nttcmis.png">
+    <link rel="icon" type="image/png" href="./icons/nttcmis.png">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 <div class="header-container">
     <div class="header-top">
-        <img src="../icons/tlogo.png" alt="Left Logo" class="logo">
+        <img src="./icons/tlogo.png" alt="Left Logo" class="logo">
         <h1 class="header-title">NATIONAL TVET TRAINER'S CERTIFICATE RECORDS</h1>
-        <img src="../icons/blogo.png" alt="Right Logo" class="logo">
+        <img src="./icons/blogo.png" alt="Right Logo" class="logo">
     </div>
     <div class="button-container">
-        <button onclick="window.location.href='index.html'" class="action-button">Home</button>
-        <button onclick="window.location.href='upload.html'" class="action-button">Upload Registry</button>
-        <button onclick="window.location.href='deletexls.php'" class="action-button">Delete Registry</button>
+        <button onclick="window.location.href='../index.html'" class="action-button">Home</button>
+        <button onclick="window.location.href='upload.html'" class="action-button">Upload Data</button>
+        <button onclick="window.location.href='convert.html'" class="action-button">Convert Excel</button>
         <button class="action-button">Export Data</button>
         <button class="action-button">Settings</button>
     </div>
 </div>
 
 <div class="container">
+    <!-- New Entry Count Display -->
+    <div id="entryCount" class="entry-count"></div>
     <!-- Date Subheader -->
     <div class="date-subheader">
         Current NTTC Holders As of: <span id="currentDate"></span>
@@ -68,7 +70,7 @@
     <div class="footer-content">
         <p>&copy; 2024 Certificate Records Management System</p>
         <div class="footer-links">
-            <a href="index.html"><i class="fas fa-home"></i> Home</a>
+            <a href="./index.html"><i class="fas fa-home"></i> Home</a>
             <a href="#"><i class="fas fa-info-circle"></i> About</a>
             <a href="#"><i class="fas fa-envelope"></i> Contact</a>
         </div>
@@ -91,7 +93,7 @@
             if (!Array.isArray(data)) {
                 throw new Error('Invalid data format');
             }
-            originalData = data.slice(4).filter(row => row && (row.D || row.E));
+            originalData = data.filter(row => row && (row.D || row.E));
             filteredData = originalData;
             renderTable();
         } catch (error) {
@@ -137,6 +139,8 @@
             `;
         }).join("");
         renderPagination();
+        // Update entry count display
+        document.getElementById("entryCount").textContent = `Total Entries: ${filteredData.length}`;
     }
 
     function renderPagination() {
@@ -183,163 +187,131 @@
 </script>
 
 <style>
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+.pagination {
+    margin: 20px 0;
+    text-align: center;
+}
 
-    body {
-        opacity: 0;
-        animation: fadeIn 0.8s ease-out forwards;
-    }
+.page-link {
+    padding: 8px 12px;
+    margin: 0 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+}
 
-    #data-table-body tr {
-        opacity: 0;
-        animation: fadeIn 0.5s ease-out forwards;
-        animation-delay: 0.8s;
-    }
+.page-link.active {
+    background-color: #007bff;
+    color: #fff;
+}
 
-    #data-table-body tr:nth-child(1) { animation-delay: 0.85s; }
-    #data-table-body tr:nth-child(2) { animation-delay: 0.9s; }
-    #data-table-body tr:nth-child(3) { animation-delay: 0.95s; }
-    #data-table-body tr:nth-child(4) { animation-delay: 1s; }
-    #data-table-body tr:nth-child(5) { animation-delay: 1.05s; }
+.page-link.disabled {
+    pointer-events: none;
+    color: #ccc;
+}
 
-    .header-container,
-    .container,
-    .footer-content {
-        opacity: 0;
-        animation: fadeIn 0.8s ease-out forwards;
-    }
+.search-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background: #f8f9fa;
+    border-radius: 50px;
+    padding: 5px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    width: 100%;
+}
 
-    .header-container { animation-delay: 0.2s; }
-    .container { animation-delay: 0.4s; }
-    .footer-content { animation-delay: 0.6s; }
+.search-wrapper:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
 
-    .pagination {
-        margin: 20px 0;
-        text-align: center;
-    }
+#searchInput {
+    width: calc(100% - 55px);
+    padding: 15px 55px 15px 25px;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    color: #495057;
+    outline: none;
+}
 
-    .page-link {
-        padding: 8px 12px;
-        margin: 0 5px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        text-decoration: none;
-        color: #333;
-    }
+#searchInput::placeholder {
+    color: #adb5bd;
+}
 
-    .page-link.active {
-        background-color: #007bff;
-        color: #fff;
-    }
+#searchButton {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #1a5f7a;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+}
 
-    .page-link.disabled {
-        pointer-events: none;
-        color: #ccc;
-    }
+#searchButton:hover {
+    background: #2c88aa;
+    transform: scale(1.05);
+}
 
+#searchButton i {
+    font-size: 18px;
+}
+
+@media (max-width: 600px) {
     .search-wrapper {
-        position: relative;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        background: #f8f9fa;
-        border-radius: 50px;
-        padding: 5px;
-        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease;
-        width: 100%;
-    }
-
-    .search-wrapper:hover {
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-        transform: translateY(-2px);
+        flex-direction: column;
+        background: transparent;
+        box-shadow: none;
+        gap: 10px;
     }
 
     #searchInput {
-        width: calc(100% - 55px);
-        padding: 15px 55px 15px 25px;
-        border: none;
-        background: transparent;
-        font-size: 16px;
-        color: #495057;
-        outline: none;
-    }
-
-    #searchInput::placeholder {
-        color: #adb5bd;
+        width: 100%;
+        background: #f8f9fa;
+        border-radius: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
     }
 
     #searchButton {
+        width: 45px;
+        padding: 12px;
+        margin: 0;
         position: absolute;
         right: 5px;
         top: 50%;
         transform: translateY(-50%);
-        margin: 0;
-        padding: 0;
-        border: none;
-        border-radius: 50%;
-        background: #1a5f7a;
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 45px;
-        height: 45px;
     }
+}
 
-    #searchButton:hover {
-        background: #2c88aa;
-        transform: scale(1.05);
-    }
+.date-subheader {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    color: #1a5f7a;
+    font-weight: 500;
+}
 
-    #searchButton i {
-        font-size: 18px;
-    }
-
-    @media (max-width: 600px) {
-        .search-wrapper {
-            flex-direction: column;
-            background: transparent;
-            box-shadow: none;
-            gap: 10px;
-        }
-
-        #searchInput {
-            width: 100%;
-            background: #f8f9fa;
-            border-radius: 25px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-        }
-
-        #searchButton {
-            width: 45px;
-            padding: 12px;
-            margin: 0;
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-    }
-
-    .date-subheader {
-        text-align: center;
-        margin-bottom: 20px;
-        font-size: 1.2em;
-        color: #1a5f7a;
-        font-weight: 500;
-    }
+.entry-count {
+    text-align: center;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #333;
+}
 </style>
 </body>
 </html>
